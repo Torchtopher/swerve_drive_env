@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.22)
 include(FetchContent)
 
 project(
-	impulse-wars
-	DESCRIPTION "Impulse Wars"
+	swerve-env
+	DESCRIPTION "Swerve Env"
 	LANGUAGES C
 )
 
@@ -100,7 +100,7 @@ if(DEFINED BUILD_PYTHON_MODULE)
 	file(GLOB_RECURSE HEADERS RELATIVE ${CMAKE_SOURCE_DIR} "src/*.h")
 
 	add_custom_command(
-		OUTPUT impulse_wars.pxd.raw
+		OUTPUT swerve.pxd.raw
 		COMMENT "Converting C headers to Cython PXD file"
 		COMMAND autopxd
 			-I "${CMAKE_CURRENT_SOURCE_DIR}/src"
@@ -108,20 +108,20 @@ if(DEFINED BUILD_PYTHON_MODULE)
 			-I "${box2d_SOURCE_DIR}/include" 
 			-I "${raylib_SOURCE_DIR}/src"
 			-D AUTOPXD
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/env.h" impulse_wars.pxd.raw
+			"${CMAKE_CURRENT_SOURCE_DIR}/src/swerve.h" swerve.pxd.raw
 		DEPENDS "${HEADERS}"
 		VERBATIM
 	)
 
 	# workaround for autopxd not setting bools correctly
 	add_custom_command(
-		OUTPUT impulse_wars.pxd
+		OUTPUT swerve.pxd
 		COMMENT "Fixing bools in Cython PXD file"
 		COMMAND "${CMAKE_COMMAND}"
-			"-DSOURCE=${CMAKE_CURRENT_BINARY_DIR}/impulse_wars.pxd.raw"
-			"-DTARGET=${CMAKE_CURRENT_BINARY_DIR}/impulse_wars.pxd"
+			"-DSOURCE=${CMAKE_CURRENT_BINARY_DIR}/swerve.pxd.raw"
+			"-DTARGET=${CMAKE_CURRENT_BINARY_DIR}/swerve.pxd"
 			-P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/fix-cython-bool.cmake"
-		DEPENDS impulse_wars.pxd.raw
+		DEPENDS swerve.pxd.raw
 		VERBATIM
 	)
 
@@ -129,13 +129,13 @@ if(DEFINED BUILD_PYTHON_MODULE)
 	# apparently Cython doesn't like when you aren't compiling a file in the working directory
 	# and that file imports a PXD file
 	configure_file(
-		"${CMAKE_CURRENT_SOURCE_DIR}/cy_impulse_wars.pyx"
-		"${CMAKE_CURRENT_BINARY_DIR}/cy_impulse_wars.pyx"
+		"${CMAKE_CURRENT_SOURCE_DIR}/cy_swerve.pyx"
+		"${CMAKE_CURRENT_BINARY_DIR}/cy_swerve.pyx"
 		COPYONLY
 	)
 
 	add_custom_command(
-		OUTPUT impulse_wars.c
+		OUTPUT swerve.c
 		COMMENT "Transpiling Cython to C"
 		COMMAND Python::Interpreter -m cython
 			-3
@@ -143,19 +143,19 @@ if(DEFINED BUILD_PYTHON_MODULE)
 			-X initializedcheck=false
 			-X wraparound=false
 			-X cdivision=true
-			cy_impulse_wars.pyx -o impulse_wars.c
-		DEPENDS impulse_wars.pxd cy_impulse_wars.pyx
+			cy_swerve.pyx -o swerve.c
+		DEPENDS swerve.pxd cy_swerve.pyx
 		VERBATIM
 	)
 
 	# build python module
-	python_add_library(cy_impulse_wars MODULE impulse_wars.c WITH_SOABI)
+	python_add_library(cy_swerve MODULE swerve.c WITH_SOABI)
 
-	configure_target(cy_impulse_wars)
+	configure_target(cy_swerve)
 	# disable false positive warnings for generated Cython source file
-	set_source_files_properties(impulse_wars.c PROPERTIES COMPILE_FLAGS "-Wno-pedantic")
+	set_source_files_properties(swerve.c PROPERTIES COMPILE_FLAGS "-Wno-pedantic")
 
-	install(TARGETS cy_impulse_wars DESTINATION .)
+	install(TARGETS cy_swerve DESTINATION .)
 elseif(DEFINED BUILD_DEMO)
 	add_executable(demo "${CMAKE_CURRENT_SOURCE_DIR}/src/demo.c")
 	configure_target(demo)
