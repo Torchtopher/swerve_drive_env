@@ -28,6 +28,9 @@ class Swerve(pufferlib.PufferEnv):
         self.c_envs.reset()
         return self.observations, []
 
+    def allocate(self):
+        self.c_envs.allocate()
+
     def step(self, actions):
         self.actions[:] = actions
         self.c_envs.step()
@@ -44,12 +47,16 @@ class Swerve(pufferlib.PufferEnv):
             self.terminals, self.truncations, info)
 
     def render(self):
-        x,y,angle,vx,vy = self.c_envs.get_render_data()
-        print(f"x: {x}, y: {y}, angle: {angle}, vx: {vx}, vy: {vy}")
+        print("Rendering")
+        x = self.c_envs.get_render_data()
+        print(f"x: {x}")
 
     def close(self):
         self.c_envs.close()
 
+
 if __name__ == "__main__":
     env = Swerve()
+    env.allocate()
+    env.reset()
     env.render()
