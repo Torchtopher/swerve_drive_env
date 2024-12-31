@@ -11,7 +11,6 @@ from cy_swerve import CySwerve
 
 class Swerve(pufferlib.PufferEnv):
     def __init__(self, num_envs=2, render_mode=None, size=11, buf=None):
-
         self.single_observation_space = gymnasium.spaces.Box(low=0, high=1,
             shape=(6,), dtype=np.float32)
         self.single_action_space = gymnasium.spaces.Box(low=-1, high=1,
@@ -21,9 +20,6 @@ class Swerve(pufferlib.PufferEnv):
         self.num_agents = num_envs
 
         super().__init__(buf)
-        print(self.actions.shape)
-        print(self.actions)
-        print(self.observations)
         self.render_info = np.zeros((self.num_agents,9), dtype=np.float32) 
         self.c_envs = CySwerve(self.observations, self.actions,
             self.rewards, self.terminals, self.render_info, num_envs)
@@ -31,16 +27,19 @@ class Swerve(pufferlib.PufferEnv):
 
 
     def reset(self, seed=None):
+        
         self.c_envs.reset()
         return self.observations, []
 
 
     def step(self, actions):
+        print("Step in python")
         self.actions[:] = actions
-        self.c_envs.step()
-
+        res = self.c_envs.step()
+        print("Step in python done with res ", res) 
         episode_returns = self.rewards[self.terminals]
-
+        print(f"self rewards: {self.rewards}")
+        print(f"Episode Returns: {episode_returns}")
         info = []
         if len(episode_returns) > 0:
             info = [{
@@ -51,9 +50,10 @@ class Swerve(pufferlib.PufferEnv):
             self.terminals, self.truncations, info)
 
     def render(self):
-        print("Rendering")
+        print("Start of Rendering call")
         arr = self.c_envs.get_render_data()
         print(f"x: {arr}")
+        exit()
         self._base_render(arr)
         plt.pause(1/60)
 
@@ -94,16 +94,16 @@ class Swerve(pufferlib.PufferEnv):
         # plot the goal point
         self.ax.scatter(goal_x, goal_y, c='g', label="Goal")
         # plot the target angle at the goal point (target location[2])
-        print(f"Goal Rot: {goal_rot}")
+        #print(f"Goal Rot: {goal_rot}")
         self.ax.quiver(goal_x, goal_y, np.cos(math.radians(goal_rot)), np.sin(math.radians(goal_rot)), color='g', label="Goal Angle", width=0.003)
         # plot the current angle of the robot
-        print(f"Robot Rot: {theta}")
+        #print(f"Robot Rot: {theta}")
         self.ax.quiver(x, y, np.cos(theta), np.sin(theta), color='r', label="Robot Angle", width=0.004, scale=30)
         # plot the velocity vector
-        print(f"Vx: {vx}, Vy: {vy}")
+        #print(f"Vx: {vx}, Vy: {vy}")
         self.ax.quiver(x, y, vx, vy, color='b', label="Velocity", width=0.003)
         # plot ideal velocity vector 
-        print(f"Goal X: {goal_x}, Goal Y: {goal_y}")
+        #print(f"Goal X: {goal_x}, Goal Y: {goal_y}")
         self.ax.quiver(x, y, goal_x - x, goal_y - y, color='g', label="Ideal Velocity", width=0.003)
         # put the reward in the title
         #self.ax.set_title(f"Reward: {self.last_reward}")
@@ -120,4 +120,6 @@ if __name__ == "__main__":
     #env.allocate()
     env.reset()
     while True:
-        env.render()
+        env.step([0,0,0])
+    env.render()
+    print("Done")

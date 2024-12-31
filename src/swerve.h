@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 const unsigned char NOOP = 0;
 const unsigned char DOWN = 1;
@@ -49,7 +50,7 @@ struct Swerve {
 
 void allocate(Swerve* env) {
     printf("Allocating\n");
-    fflush(NULL); 
+    //fflush(NULL); 
     env->observations = (float*)calloc(NUM_OBS, sizeof(float));
     env->contActions = (float*)calloc(NUM_ACTIONS, sizeof(float));
     env->rewards = (float*)calloc(1, sizeof(float));
@@ -67,15 +68,17 @@ void free_allocated(Swerve* env) {
 
 void reset(Swerve* env) {
     printf("Reseting env");
-    fflush(NULL); 
+    //fflush(NULL); 
     memset(env->observations, 0, NUM_OBS*sizeof(float));
     env->tick = 0;
     env->x_pos = MAX_X / 2;
     env->y_pos = MAX_Y / 2;
     env->angle = 0;
+
     env->x_vel = 0;
     env->y_vel = 0;
     env->omega = 0;
+    
     env->goal_x_pos = 9;
     env->goal_y_pos = 9;
     env->goal_angle = 90;
@@ -83,13 +86,38 @@ void reset(Swerve* env) {
     // ADD LOGIC FOR RESETING HERE
 }
 
-void step(Swerve* env) {
+int step(Swerve* env) {
+    printf("C: Step\n");
+    env->terminals[0] = 0;
+    env->rewards[0] = 5;
+
+    env->x_vel += env->contActions[0] * dt;
+    env->y_vel += env->contActions[1] * dt;
+    env->omega += env->contActions[2] * dt;
+
+    env->x_pos += env->x_vel * dt;
+    env->y_pos += env->y_vel * dt;
+    env->angle += env->omega * dt;
+
+    env->observations[OBS_VX] = env->x_vel;
+    env->observations[OBS_VY] = env->y_vel;
+    env->observations[OBS_OMEGA] = env->omega;
+    env->observations[OBS_GOAL_REL_X] = env->goal_x_pos - env->x_pos;  
+    env->observations[OBS_GOAL_REL_Y] = env->goal_y_pos - env->y_pos;
+    env->observations[OBS_GOAL_REL_ANGLE] = env->goal_angle - env->angle;  
+
+    if (env->tick > 300) {
+        reset(env);
+        return 99;
+    }
+
     env->tick += 1;
+    return 99; 
 }
 
 float* get_render_data(Swerve* env) {
     printf("Geting render data\n");
-    fflush(NULL); 
+    //fflush(NULL); 
     // xyangle
     env->render_info[0] = env->x_pos;
     env->render_info[1] = env->y_pos;
