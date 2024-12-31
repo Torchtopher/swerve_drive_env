@@ -19,10 +19,8 @@ cdef extern from "swerve.h":
         float goal_angle;
         int tick;
 
-
     void reset(Swerve* env)
     void step(Swerve* env)
-    void allocate(Swerve* env)
     float* get_render_data(Swerve* env)
 
 cdef class CySwerve:
@@ -31,7 +29,7 @@ cdef class CySwerve:
         int num_envs
 
     def __init__(self, float[:, :] observations, float[:, :] actions,
-            float[:] rewards, unsigned char[:] terminals, int num_envs):
+            float[:] rewards, unsigned char[:] terminals, float [:,:] render_info, int num_envs):
 
         self.envs = <Swerve*> calloc(num_envs, sizeof(Swerve))
         self.num_envs = num_envs
@@ -43,6 +41,7 @@ cdef class CySwerve:
                 contActions = &actions[i, 0],
                 rewards = &rewards[i],
                 terminals = &terminals[i],
+                render_info = &render_info[i, 0]
             )
 
     def reset(self):

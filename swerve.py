@@ -24,8 +24,9 @@ class Swerve(pufferlib.PufferEnv):
         print(self.actions.shape)
         print(self.actions)
         print(self.observations)
+        self.render_info = np.zeros((self.num_agents,9), dtype=np.float32) 
         self.c_envs = CySwerve(self.observations, self.actions,
-            self.rewards, self.terminals, num_envs)
+            self.rewards, self.terminals, self.render_info, num_envs)
         self.fig, self.ax = None, None
 
 

@@ -94,13 +94,13 @@ float* get_render_data(Swerve* env) {
     env->render_info[0] = env->x_pos;
     env->render_info[1] = env->y_pos;
     env->render_info[2] = env->angle;
-
-    // vxvyomega
+// 
+    // // vxvyomega
     env->render_info[3] = env->observations[OBS_VX];
     env->render_info[4] = env->observations[OBS_VY];
     env->render_info[5] = env->observations[OBS_OMEGA];
-
-    // goal xyangle
+// 
+    // // goal xyangle
     env->render_info[6] = env->goal_x_pos;
     env->render_info[7] = env->goal_y_pos;
     env->render_info[8] = env->goal_angle;
