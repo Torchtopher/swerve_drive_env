@@ -76,11 +76,10 @@ void reset(Swerve* env) {
     env->x_vel = 0;
     env->y_vel = 0;
     env->omega = 0;
-    env->goal_x_pos = 5;
+    env->goal_x_pos = 9;
+    env->goal_y_pos = 9;
+    env->goal_angle = 90;
 
-    env->observations[0] = 69; // REMOVE0
-    env->observations[1] = 420; 
-    env->render_info[0] = 4;
     // ADD LOGIC FOR RESETING HERE
 }
 
@@ -91,21 +90,20 @@ void step(Swerve* env) {
 float* get_render_data(Swerve* env) {
     printf("Geting render data\n");
     fflush(NULL); 
-    // env->goal_x_pos;
-    //// xyangle
-    //env->render_info[0] = env->x_pos;
-    //env->render_info[1] = env->y_pos;
-    //env->render_info[2] = env->angle;
-//
-    //// vxvyomega
-    //env->render_info[3] = env->observations[OBS_VX];
-    //env->render_info[4] = env->observations[OBS_VY];
-    //env->render_info[5] = env->observations[OBS_OMEGA];
-//
-    //// 
-    //env->render_info[6] = env->observations[OBS_VX];
-    //env->render_info[7] = env->observations[OBS_VX];
-    //env->render_info[8] = env->observations[OBS_VX];
+    // xyangle
+    env->render_info[0] = env->x_pos;
+    env->render_info[1] = env->y_pos;
+    env->render_info[2] = env->angle;
+
+    // vxvyomega
+    env->render_info[3] = env->observations[OBS_VX];
+    env->render_info[4] = env->observations[OBS_VY];
+    env->render_info[5] = env->observations[OBS_OMEGA];
+
+    // goal xyangle
+    env->render_info[6] = env->goal_x_pos;
+    env->render_info[7] = env->goal_y_pos;
+    env->render_info[8] = env->goal_angle;
     // copy? 
     //int i;
     //for (i=0;i < 9;i++) {

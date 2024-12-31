@@ -3,11 +3,21 @@ from cython.operator import dereference
 
 cdef extern from "swerve.h":
     ctypedef struct Swerve:
-        float* observations
-        float* contActions
-        float* rewards
-        unsigned char* terminals
-        int tick
+        float* observations; 
+        float* contActions;
+        float* rewards; 
+        unsigned char* terminals;
+        float* render_info;
+        float x_pos; 
+        float y_pos;
+        float angle;
+        float x_vel;
+        float y_vel; 
+        float omega;
+        float goal_x_pos;
+        float goal_y_pos;
+        float goal_angle;
+        int tick;
 
 
     void reset(Swerve* env)
@@ -34,11 +44,6 @@ cdef class CySwerve:
                 rewards = &rewards[i],
                 terminals = &terminals[i],
             )
-
-    def allocate(self): 
-        cdef int i
-        for i in range(self.num_envs):
-            allocate(&self.envs[i])
 
     def reset(self):
         cdef int i
