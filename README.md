@@ -1,6 +1,6 @@
-# Impulse Wars
+# Swerve Drive Env
 
-A C reinforcement learning environment that is very closely based off of the game Retrograde Arena. 
+A C reinforcement learning environment where an agent tries to get its position to a goal.
 
 ## Building
 
